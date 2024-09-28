@@ -1,6 +1,6 @@
 
 // node fechadura id_sala_100 senha_sala_100
-
+// teste
 if (process.argv.length != 4)
 {
     console.log('forma de usar:')
