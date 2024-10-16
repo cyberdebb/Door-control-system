@@ -1,8 +1,6 @@
 var express = require('express');
 const webSocket = require('ws');
-
 const {conecta, portasDisponiveis} = require('models/mongodb')
-
 
 var app = express();
 app.use(bodyParser.json())
@@ -14,19 +12,29 @@ const wss = new webSocket.Server({ port:8080 });
 
 
 //APP
-app.get('/', function(req, res){
-  //debs
+app.get('/', function(req, res) {
+  res.redirect('/login.html');
 });
 
-app.get('/login', function(req, res)
-{
-  //debs
+app.get('/login', async function(req, res) {
+  const idUFSC = req.query.idUFSC;
+  const senha = req.query.senha;
+  try {
+    let professor = await db.login(idUFSC, senha);
+    if (professor) {
+      res.redirect('/menu.html');
+    } 
+    else {
+      res.send("Login inválido");
+    }
+  } 
+  catch (error) {
+    console.log("Erro ao fazer o login", error);
+    res.status(500).json({error: error.message});
+  }
 });
 
-
-//Acessa o 
-app.get('/lista', async function(req,res)
-{
+app.get('/lista', async function(req,res) {
   const idUFSC = req.params.idUFSC;  // Email do professor passado na URL
 
   try{
@@ -37,23 +45,42 @@ app.get('/lista', async function(req,res)
   }
 });
 
-app.get('/abre',function(req,res){
+app.get('/abre',function(req,res) {
   //Recebe id da porta que é pra abrir
   //
   let idPorta;
 
 });
 
-
-conecta().then(() => {
-  populaProfessores();
-  populaSalas();
-
-  app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
-  });
+app.get(/^(.+)$/, function(req, res) {
+  try {
+      res.write("A página que vc busca não existe")
+      res.end();
+  } catch (e) {
+      res.end();
+  }
 });
+
+
+async function iniciaServidor() {
+  try {
+    await conecta();
+    await populaProfessores();
+    await populaSalas();
+
+    app.listen(3000, () => {
+      console.log('Servidor rodando na porta 3000');
+    });
+  } 
+  catch (error) {
+    console.error('Erro ao iniciar o servidor:', error);
+  }
+}
+
+iniciaServidor();
 //END APP
+
+
 
 //WEBSOCKET
 wss.on('connection',(ws)=>{

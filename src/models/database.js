@@ -21,9 +21,10 @@ async function conecta() {
   return {db, professores, salas};
 }
 
+
 async function portasDisponiveis(idUFSC) {
   try {
-    const professor = await professores.findOne({ id: idUFSC });
+    const professor = await professores.findOne({id:idUFSC});
 
     if (professor) {
       return professor.portasDisponiveis;
@@ -38,7 +39,7 @@ async function portasDisponiveis(idUFSC) {
   }
 }
 
-// Função para popular o banco com os professores do JSON
+
 async function populaProfessores() {
   try {
     // Lê o arquivo JSON contendo os professores
@@ -54,6 +55,7 @@ async function populaProfessores() {
     throw error;
   }
 }
+
 
 async function populaSalas() {
   try {
@@ -71,11 +73,23 @@ async function populaSalas() {
   }
 }
 
+async function login(idUFSC, senha) {
+  try {
+    let professor = await professores.findOne({id:idUFSC});
+    if (senha == professor.senha)    
+      return professor;
+  }
+  catch (error) {
+    console.error('Erro ao popular o banco de dados:', error);
+    throw error;
+  }
+}
 
-module.exports
-{
+
+module.exports = {
   conecta,
   portasDisponiveis,
   populaProfessores,
-  populaSalas;
-}
+  populaSalas,
+  login
+};
