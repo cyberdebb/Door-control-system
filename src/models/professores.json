@@ -1,0 +1,14 @@
+[
+  {
+    "nome": "Professor Milton",
+    "idUFSC": "professormilton@grad.ufsc.br",
+    "senha": "senhaSuperSecreta123",
+    "portas_disponiveis": [201, 202, 101]
+  },
+  {
+    "nome": "Professor da Silva",
+    "idUFSC": "professordasilva@grad.ufsc.br",
+    "senha": "senhaMaisSegura456",
+    "portas_disponiveis": [102, 103]
+  }
+]
