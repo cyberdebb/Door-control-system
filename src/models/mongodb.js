@@ -9,20 +9,32 @@ async function conecta() {
   professores = await db.collection("professores");
   salas = await db.collection("salas");
 
-  await populaProfessores();
-  await populaSalas();
+  try {
+    await populaProfessores();
+    await populaSalas();
+  }
+  catch (error) {
+    console.log('Erro ao popular os dados: ', error);
+    throw error;
+  }
 
   return {db, professores, salas};
 }
 
-async function portasDisponiveis(idUFSC){
-  const professor = await professores.findOne({id: idUFSC });
+async function portasDisponiveis(idUFSC) {
+  try {
+    const professor = await professores.findOne({ id: idUFSC });
 
-  if(professor){
-    return professor.portasDisponiveis;
+    if (professor) {
+      return professor.portasDisponiveis;
+    } 
+    else {
+      throw new Error(`Professor com ID ${idUFSC} não encontrado!`);
+    }
   } 
-  else{
-    throw new Error(`Professor com ID ${idUFSC} não encontrado!`);
+  catch (error) {
+    console.error('Erro ao buscar portas disponíveis:', error.message);
+    throw error;
   }
 }
 
@@ -39,6 +51,7 @@ async function populaProfessores() {
   } 
   catch (error) {
     console.error('Erro ao popular o banco de dados:', error);
+    throw error;
   }
 }
 
@@ -54,6 +67,7 @@ async function populaSalas() {
   } 
   catch (error) {
     console.error('Erro ao popular o banco de dados:', error);
+    throw error;
   }
 }
 
