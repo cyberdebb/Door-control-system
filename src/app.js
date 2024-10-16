@@ -46,6 +46,9 @@ app.get('/abre',function(req,res){
 
 
 conecta().then(() => {
+  populaProfessores();
+  populaSalas();
+
   app.listen(3000, () => {
     console.log('Servidor rodando na porta 3000');
   });

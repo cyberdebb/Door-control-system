@@ -15,7 +15,7 @@ async function conecta() {
   return {db, professores, salas};
 }
 
-async function portasDisponiveis(professores, idUFSC){
+async function portasDisponiveis(idUFSC){
   const professor = await professores.findOne({id: idUFSC });
 
   if(professor){
