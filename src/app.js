@@ -1,7 +1,7 @@
 var express = require('express');
 const webSocket = require('ws');
 
-const {conecta,portasDisponiveis} = require('models/mongodb')
+const {conecta, portasDisponiveis} = require('models/mongodb')
 
 
 var app = express();
