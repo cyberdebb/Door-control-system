@@ -1,4 +1,7 @@
 const {MongoClient} = require('mongodb');
+const { createHmac } = require('crypto');
+const fs = require('fs').promises;  // Usando a versão assíncrona do fs
+
 var db, professores, salas;
 
 async function conecta() {
@@ -22,12 +25,12 @@ async function conecta() {
 }
 
 
-async function portasDisponiveis(idUFSC) {
+async function salasDisponiveis(idUFSC) {
   try {
     const professor = await professores.findOne({id:idUFSC});
 
     if (professor) {
-      return professor.portasDisponiveis;
+      return professor.salasDisponiveis;
     } 
     else {
       throw new Error(`Professor com ID ${idUFSC} não encontrado!`);
@@ -39,14 +42,29 @@ async function portasDisponiveis(idUFSC) {
   }
 }
 
+function hashSenha(senha) {
+  return createHmac('sha256', 'crypt')
+            .update(senha)
+            .digest('hex');
+}
 
 async function populaProfessores() {
   try {
     // Lê o arquivo JSON contendo os professores
     const data = await fs.readFile('professores.json', 'utf8');
-    const professores_dados = JSON.parse(data);
+    let professores_dados = JSON.parse(data);
 
-    // Insere os professores no banco de dados
+    // Hasheia as senhas dos professores antes de inserir no banco
+    professores_dados = professores_dados.map(prof => {
+      return {
+        nome: prof.nome,
+        idUFSC: prof.idUFSC,
+        salasDisponiveis: prof.salasDisponiveis,
+        senha: hashSenha(prof.senha)  // Aplica o hash na senha
+      };
+    });
+
+    // Insere os professores no banco de dados com as senhas hasheadas
     await professores.insertMany(professores_dados);
     console.log('Professores inseridos com sucesso!');
   } 
@@ -73,11 +91,16 @@ async function populaSalas() {
   }
 }
 
-async function login(idUFSC, senha) {
+async function login(dados) {
   try {
-    let professor = await professores.findOne({id:idUFSC});
-    if (senha == professor.senha)    
+    let professor = await professores.findOne({id:dados.id, senha:dados.senha});
+
+    if (professor) {
       return professor;
+    } 
+    else {
+      return null;
+    }
   }
   catch (error) {
     console.error('Erro ao popular o banco de dados:', error);
@@ -88,7 +111,8 @@ async function login(idUFSC, senha) {
 
 module.exports = {
   conecta,
-  portasDisponiveis,
+  salasDisponiveis,
+  hashSenha,
   populaProfessores,
   populaSalas,
   login
