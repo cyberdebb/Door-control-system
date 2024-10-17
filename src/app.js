@@ -53,12 +53,14 @@ app.get('/lista', async function(req,res) {
   }
 });
 
+
 app.get('/abre',function(req,res) {
   //Recebe id da porta que é pra abrir
   //
   let idPorta;
 
 });
+
 
 app.get(/^(.+)$/, function(req, res) {
   try {
